@@ -110,8 +110,7 @@ def get_argumentative_prediction(text):
             - Do NOT rely only on the above words. They are just examples. Look at whether the sentence’s main purpose is to make an argument or just state information.
             - Only give your final answer as one word in lowercase:"argumentative" or "non-argumentative"
 
-            TEXT TO ANALYZE:
-            "{text}"
+            ## TEXT TO ANALYZE: "{text}"
 
             Your Response:
             """

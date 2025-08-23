@@ -149,8 +149,7 @@ def get_argumentative_prediction(text, filename):
             ## CASE FILE CONTENTS:
             {case_file_content}
             
-            TEXT TO ANALYZE:
-            "{text}"
+            ## TEXT TO ANALYZE: "{text}"
 
             Your Response:
             """

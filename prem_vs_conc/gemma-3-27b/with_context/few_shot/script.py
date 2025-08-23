@@ -152,7 +152,7 @@ def get_premise_conclusion_prediction(text, filename):
             ## CASE FILE CONTENTS:
             {case_file_content}
 
-            TEXT: "{text}"
+            ## TEXT TO ANALYZE: "{text}"
 
             Your Response:
             """

@@ -115,7 +115,7 @@ def get_premise_conclusion_prediction(text):
         - These example words are just clues, not rules. Even if the text uses different words, decide based on whether it is giving support (premise) or ending the argument (conclusion).
         - Only answer with one lowercase word: "premise" or "conclusion"
 
-        TEXT: "{text}"
+        ## TEXT TO ANALYZE: "{text}"
 
         Your Response:
         """

@@ -123,15 +123,13 @@ def get_argumentative_prediction(text, filename):
             - Do NOT rely only on the above words. They are just examples. Look at whether the sentence’s main purpose is to make an argument or just state information.
             - Only give your final answer as one word in lowercase:"argumentative" or "non-argumentative"
 
-            TEXT TO ANALYZE:
-            "{text}"
+            ## CASE FILE CONTENTS:
+            {case_file_content}
+            
+            ## TEXT TO ANALYZE: "{text}"
 
             Your Response:
             """
-
-        print(filename)
-        print("***************************************")
-        print(prompt)   
         
         # Update key usage
         now = datetime.now()
