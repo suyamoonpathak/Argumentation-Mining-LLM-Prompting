@@ -81,7 +81,18 @@ def select_next_available_key():
     
     return False
 
-def get_argumentative_prediction(text):
+def get_case_file_content(filename):
+    case_filename = filename.replace('.csv', '.txt')
+    case_file_path = os.path.join('original_txt_files', case_filename)
+    
+    if os.path.exists(case_file_path):
+        with open(case_file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return "Complete case file not found."
+
+
+def get_argumentative_prediction(text, filename):
     global current_key_index
     select_next_available_key()
     
@@ -89,6 +100,8 @@ def get_argumentative_prediction(text):
     current_key = api_keys[current_key_index]
     
     try:
+        case_file_content = get_case_file_content(filename)
+        
         prompt = f"""You are a Harvard-trained legal expert specialized in legal argumentation analysis, with deep expertise in distinguishing "argumentative" from "non-argumentative" text in legal case files.
 
             ## TASK: Read the sentence and decide if it is argumentative or non-argumentative. Your analysis is very important. Your answer will be used in a legal research tool for senior judges working on high-impact cases. A wrong answer could cause legal mistakes, unfair judgments, or even wrongful convictions. So be very careful and precise.
@@ -116,6 +129,9 @@ def get_argumentative_prediction(text):
             Your Response:
             """
 
+        print(filename)
+        print("***************************************")
+        print(prompt)   
         
         # Update key usage
         now = datetime.now()
@@ -146,7 +162,7 @@ def get_argumentative_prediction(text):
             key_usage[current_key]['request_times'].pop()
         current_key_index = (current_key_index + 1) % len(api_keys)
         genai.configure(api_key=api_keys[current_key_index])
-        return get_argumentative_prediction(text)
+        return get_argumentative_prediction(text, filename)
 
 def process_csv_files():
     # Create output directory if it doesn't exist
@@ -201,7 +217,7 @@ def process_csv_files():
             log_status(idx + 1, total_rows, os.path.basename(csv_file))
             
             # Get prediction from Gemini
-            prediction = get_argumentative_prediction(text)
+            prediction = get_argumentative_prediction(text, os.path.basename(csv_file))
             
             print(f"Text: {text[:100]}...")
             print(f"Actual: {actual_label} | Predicted: {prediction}")

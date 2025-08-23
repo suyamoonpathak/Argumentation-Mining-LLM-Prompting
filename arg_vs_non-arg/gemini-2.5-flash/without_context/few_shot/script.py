@@ -105,6 +105,28 @@ def get_argumentative_prediction(text):
             1. Just facts, dates, or events without reasoning.
             2. Direct quotes of law or testimony without any analysis.
             3. Descriptions of court procedures (e.g., filing a motion).
+            
+            ## EXAMPLES:
+
+            #ARGUMENTATIVE (Premises/Conclusions):
+            1. "In those circumstances, the second part of this ground of appeal must be rejected as, in part, unfounded and, in part, inadmissible."
+            [Analysis: Contains evaluative conclusion "must be rejected" with reasoning "unfounded and inadmissible"]
+
+            2. "The documents of the proceedings at first instance show that the argument put forward by the Hellenic Republic before the Court to the effect that the settled case-law of the Court relating to the concept of State aid, referred to in paragraph 45 of this judgment, is inapplicable to the present case because of the exceptional economic conditions experienced by the Hellenic Republic in 2009, was not put forward before the General Court."
+            [Analysis: Presents evidence-based reasoning with causal connection "because of"]
+
+            3. "At first instance, the Hellenic Republic complained that the Commission did not adequately explain, in the decision at issue, in what respect the compensation payments had conferred on the farmers concerned a competitive advantage affecting trade between Member States, and could, therefore, be classified as State aid, notwithstanding the serious crisis affecting the Greek economy at that time."
+            [Analysis: Contains evaluative criticism "did not adequately explain" and logical inference "therefore"]
+
+            #NON-ARGUMENTATIVE:
+            1. "Under Article 3a of Law 1790/1988, in the version applicable to the dispute, the ELGA insurance scheme is compulsory and covers natural risks."
+            [Analysis: Pure statutory description without interpretation or evaluation]
+
+            2. "Point 1 of that communication states: '... The possibility under point 4.2 [of the TCF] to grant a compatible limited amount of aid does not apply to undertakings active in the primary production of agricultural products."
+            [Analysis: Direct quotation of regulatory text without analysis]
+
+            3. "By letter lodged at the Court Registry on 2 March 2015, the Greek Government requested, pursuant to the third subparagraph of Article 16 of the Statute of the Court of Justice of the European Union, that the Court sit as a Grand Chamber."
+            [Analysis: Procedural/administrative description of court filing]
 
             ### LIMITATION:
             - Do NOT rely only on the above words. They are just examples. Look at whether the sentence’s main purpose is to make an argument or just state information.

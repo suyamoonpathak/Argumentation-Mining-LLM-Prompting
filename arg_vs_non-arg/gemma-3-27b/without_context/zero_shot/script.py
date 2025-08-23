@@ -85,7 +85,7 @@ def get_argumentative_prediction(text):
     global current_key_index
     select_next_available_key()
     
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('models/gemma-3-27b-it')
     current_key = api_keys[current_key_index]
     
     try:

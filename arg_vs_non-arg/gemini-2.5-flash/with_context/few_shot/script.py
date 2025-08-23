@@ -81,7 +81,18 @@ def select_next_available_key():
     
     return False
 
-def get_argumentative_prediction(text):
+def get_case_file_content(filename):
+    case_filename = filename.replace('.csv', '.txt')
+    case_file_path = os.path.join('original_txt_files', case_filename)
+    
+    if os.path.exists(case_file_path):
+        with open(case_file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    else:
+        return "Complete case file not found."
+
+
+def get_argumentative_prediction(text, filename):
     global current_key_index
     select_next_available_key()
     
@@ -89,6 +100,9 @@ def get_argumentative_prediction(text):
     current_key = api_keys[current_key_index]
     
     try:
+        case_file_content = get_case_file_content(filename)
+
+        
         prompt = f"""You are a Harvard-trained legal expert specialized in legal argumentation analysis, with deep expertise in distinguishing "argumentative" from "non-argumentative" text in legal case files.
 
             ## TASK: Read the sentence and decide if it is argumentative or non-argumentative. Your analysis is very important. Your answer will be used in a legal research tool for senior judges working on high-impact cases. A wrong answer could cause legal mistakes, unfair judgments, or even wrongful convictions. So be very careful and precise.
@@ -105,18 +119,42 @@ def get_argumentative_prediction(text):
             1. Just facts, dates, or events without reasoning.
             2. Direct quotes of law or testimony without any analysis.
             3. Descriptions of court procedures (e.g., filing a motion).
+            
+            ## EXAMPLES:
+
+            #ARGUMENTATIVE (Premises/Conclusions):
+            1. "In those circumstances, the second part of this ground of appeal must be rejected as, in part, unfounded and, in part, inadmissible."
+            [Analysis: Contains evaluative conclusion "must be rejected" with reasoning "unfounded and inadmissible"]
+
+            2. "The documents of the proceedings at first instance show that the argument put forward by the Hellenic Republic before the Court to the effect that the settled case-law of the Court relating to the concept of State aid, referred to in paragraph 45 of this judgment, is inapplicable to the present case because of the exceptional economic conditions experienced by the Hellenic Republic in 2009, was not put forward before the General Court."
+            [Analysis: Presents evidence-based reasoning with causal connection "because of"]
+
+            3. "At first instance, the Hellenic Republic complained that the Commission did not adequately explain, in the decision at issue, in what respect the compensation payments had conferred on the farmers concerned a competitive advantage affecting trade between Member States, and could, therefore, be classified as State aid, notwithstanding the serious crisis affecting the Greek economy at that time."
+            [Analysis: Contains evaluative criticism "did not adequately explain" and logical inference "therefore"]
+
+            #NON-ARGUMENTATIVE:
+            1. "Under Article 3a of Law 1790/1988, in the version applicable to the dispute, the ELGA insurance scheme is compulsory and covers natural risks."
+            [Analysis: Pure statutory description without interpretation or evaluation]
+
+            2. "Point 1 of that communication states: '... The possibility under point 4.2 [of the TCF] to grant a compatible limited amount of aid does not apply to undertakings active in the primary production of agricultural products."
+            [Analysis: Direct quotation of regulatory text without analysis]
+
+            3. "By letter lodged at the Court Registry on 2 March 2015, the Greek Government requested, pursuant to the third subparagraph of Article 16 of the Statute of the Court of Justice of the European Union, that the Court sit as a Grand Chamber."
+            [Analysis: Procedural/administrative description of court filing]
 
             ### LIMITATION:
             - Do NOT rely only on the above words. They are just examples. Look at whether the sentence’s main purpose is to make an argument or just state information.
             - Only give your final answer as one word in lowercase:"argumentative" or "non-argumentative"
 
+            ## CASE FILE CONTENTS:
+            {case_file_content}
+            
             TEXT TO ANALYZE:
             "{text}"
 
             Your Response:
             """
-
-        
+            
         # Update key usage
         now = datetime.now()
         key_usage[current_key]['count'] += 1
@@ -146,7 +184,7 @@ def get_argumentative_prediction(text):
             key_usage[current_key]['request_times'].pop()
         current_key_index = (current_key_index + 1) % len(api_keys)
         genai.configure(api_key=api_keys[current_key_index])
-        return get_argumentative_prediction(text)
+        return get_argumentative_prediction(text, filename)
 
 def process_csv_files():
     # Create output directory if it doesn't exist
@@ -201,7 +239,7 @@ def process_csv_files():
             log_status(idx + 1, total_rows, os.path.basename(csv_file))
             
             # Get prediction from Gemini
-            prediction = get_argumentative_prediction(text)
+            prediction = get_argumentative_prediction(text, os.path.basename(csv_file))
             
             print(f"Text: {text[:100]}...")
             print(f"Actual: {actual_label} | Predicted: {prediction}")
