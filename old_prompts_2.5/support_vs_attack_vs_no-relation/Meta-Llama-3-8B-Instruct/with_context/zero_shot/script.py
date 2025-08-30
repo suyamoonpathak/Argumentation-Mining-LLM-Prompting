@@ -29,7 +29,15 @@ print("Model loaded successfully.")
 # 3. LLaMA3 inference function
 # -----------------------------
 def get_relation_prediction(source_text, target_text, file_name):
-    system_prompt = """You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
+    txt_file_path = os.path.join('original_txt_files', f"{file_name}.txt")
+    try:
+        with open(txt_file_path, 'r', encoding='utf-8') as file:
+            file_content = file.read()
+    except FileNotFoundError:
+        file_content = f"File '{file_name}.txt' not found in the 'original_txt_files' folder."
+    
+    
+    prompt = """You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
 
 CLASSIFICATION TASK:
 Determine the relationship between the source argument and target argument. The relationship can be "support", "attack", or "no-relation".
@@ -57,25 +65,7 @@ Look for NO-RELATION indicators:
 - No logical connection between the reasoning chains
 - Independent factual statements without argumentative relationship
 
-"""
-    
-    # Step 1: Read the corresponding .txt file
-    txt_file_path = os.path.join('original_txt_files', f"{file_name}.txt")
-    try:
-        with open(txt_file_path, 'r', encoding='utf-8') as file:
-            file_content = file.read()
-    except FileNotFoundError:
-        file_content = f"File '{file_name}.txt' not found in the 'original_txt_files' folder."
-
-    system_prompt += f"\n\n## CASE FILE CONTENTS: {file_content}\n\n"
-    system_prompt += """### LIMITATION:
-- Do NOT just look for the sample words. Think about the meaning and the relationship.
-- Only respond with one lowercase word: "support", "attack", "no-relation"
-"""
-    
-    # Step 2: Update the user_prompt to include file content
-    user_prompt = f"""
-    CASE FILE CONTEXT:
+CASE FILE CONTEXT:
 {file_content}
 
 SOURCE ARGUMENT:
@@ -93,7 +83,7 @@ Respond with exactly one word: "support" or "attack" or "no-relation"
 Your classification:"""
 
     messages = [
-        {"role": "user", "content": system_prompt+ user_prompt},
+        {"role": "user", "content": prompt},
     ]
     
     # Apply chat template

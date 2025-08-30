@@ -29,7 +29,7 @@ print("Model loaded successfully.")
 # 3. LLaMA3 inference function
 # -----------------------------
 def get_relation_prediction(source_text, target_text):
-    system_prompt = """You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
+    prompt = """You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
 
 CLASSIFICATION TASK:
 Determine the relationship between the source argument and target argument. The relationship can be "support", "attack", or "no-relation".
@@ -86,26 +86,22 @@ NO-RELATION Examples:
 Target: "minimum mining fee payable for natural gas fields put into production before 1  January 1998."
 [Analysis: Source discusses the legal requirement for measures to confer selective advantage on recipients in State aid analysis, while target refers to specific mining fee regulations for natural gas fields with a temporal cutoff date - these address completely different legal domains (State aid law vs. natural resource taxation) with no logical connection between selective advantage concepts and mining fee structures]
 
-"""
+SOURCE ARGUMENT:
+"{source_text}"
 
-    user_prompt = f"""
+TARGET ARGUMENT:
+"{target_text}"
 
-    SOURCE ARGUMENT:
-    "{source_text}"
+INSTRUCTIONS:
+Apply your legal training to analyze how the source argument relates to the target argument. Consider whether the source strengthens, weakens, or has no bearing on the target's position.
 
-    TARGET ARGUMENT:
-    "{target_text}"
+OUTPUT FORMAT:
+Respond with exactly one word: "support" or "attack" or "no-relation"
 
-    INSTRUCTIONS:
-    Apply your legal training to analyze how the source argument relates to the target argument. Consider whether the source strengthens, weakens, or has no bearing on the target's position.
-
-    OUTPUT FORMAT:
-    Respond with exactly one word: "support" or "attack" or "no-relation"
-
-    Your classification:"""
+Your classification:"""
 
     messages = [
-        {"role": "user", "content": system_prompt+ user_prompt},
+        {"role": "user", "content": prompt},
     ]
     
     # Apply chat template
