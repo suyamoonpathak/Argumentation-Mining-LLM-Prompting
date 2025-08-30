@@ -86,7 +86,7 @@ def get_relation_prediction(source_text, target_text, file_name):
     
     txt_file_path = os.path.join('original_txt_files', f"{file_name}.txt")
     try:
-        with open(txt_file_path, 'r', encoding='utf-8') as file:
+        with open(txt_file_path, 'r', encoding='latin-1') as file:
             file_content = file.read()
     except FileNotFoundError:
         file_content = f"File '{file_name}.txt' not found in the 'original_txt_files' folder."
@@ -212,7 +212,7 @@ def process_csv_files():
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
             # Create new file with headers
-            with open(output_filename, 'w', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'w', newline='', encoding='latin-1') as f:
                 writer = csv.writer(f)
                 writer.writerow(['source_text', 'target_text', 'actual_relation', 'predicted_relation'])
 
@@ -236,7 +236,7 @@ def process_csv_files():
             print(f"Actual: {actual_relation} | Predicted: {prediction}")
 
             # Immediately append this row to the CSV file
-            with open(output_filename, 'a', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'a', newline='', encoding='latin-1') as f:
                 writer = csv.writer(f)
                 writer.writerow([source_text, target_text, actual_relation, prediction])
 

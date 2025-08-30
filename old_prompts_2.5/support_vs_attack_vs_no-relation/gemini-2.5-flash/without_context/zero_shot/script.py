@@ -201,7 +201,7 @@ def process_csv_files():
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
             # Create new file with headers
-            with open(output_filename, 'w', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'w', newline='', encoding='latin-1') as f:
                 writer = csv.writer(f)
                 writer.writerow(['source_text', 'target_text', 'actual_relation', 'predicted_relation'])
 
@@ -225,7 +225,7 @@ def process_csv_files():
             print(f"Actual: {actual_relation} | Predicted: {prediction}")
 
             # Immediately append this row to the CSV file
-            with open(output_filename, 'a', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'a', newline='', encoding='latin-1') as f:
                 writer = csv.writer(f)
                 writer.writerow([source_text, target_text, actual_relation, prediction])
 
