@@ -8,6 +8,9 @@ import pandas as pd
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+
 # -----------------------------
 # 1. Load LLaMA3 model
 # -----------------------------
@@ -30,7 +33,7 @@ def get_case_file_content(filename):
     case_filename = filename.replace('.csv', '.txt')
     case_file_path = os.path.join('original_txt_files', case_filename)
     if os.path.exists(case_file_path):
-        with open(case_file_path, 'r', encoding='latin-1') as f:
+        with open(case_file_path, 'r', encoding='latin-1', errors='replace') as f:
             return f.read()
     else:
         return "Complete case file not found."
@@ -143,7 +146,7 @@ def process_csv_files():
             start_idx = len(existing_df)
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
-            with open(output_filename, 'w', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'w', newline='', encoding='latin-1', errors='replace') as f:
                 writer = csv.writer(f)
                 writer.writerow(['text', 'actual_class', 'actual_label', 'predicted_label'])
 
@@ -160,7 +163,7 @@ def process_csv_files():
             print(f"Text: {text[:100]}...")
             print(f"Actual: {actual_label} | Predicted: {prediction}")
 
-            with open(output_filename, 'a', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'a', newline='', encoding='latin-1', errors='replace') as f:
                 writer = csv.writer(f)
                 writer.writerow([text, actual_class, actual_label, prediction])
 

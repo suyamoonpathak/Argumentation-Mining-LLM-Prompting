@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 # -----------------------------
 # 1. Load LLaMA3 model
@@ -89,13 +90,14 @@ def get_premise_conclusion_prediction(text):
     response = outputs[0][input_ids.shape[-1]:]
     prediction = tokenizer.decode(response, skip_special_tokens=True).strip().lower()
 
-    # Normalize output
-    if 'premise' in prediction and 'conclusion' not in prediction:
-        return 'premise'
-    elif 'conclusion' in prediction:
-        return 'conclusion'
-    else:
-        return '--'
+    return prediction
+    # # Normalize output
+    # if 'premise' in prediction and 'conclusion' not in prediction:
+    #     return 'premise'
+    # elif 'conclusion' in prediction:
+    #     return 'conclusion'
+    # else:
+    #     return '--'
 
 
 # -----------------------------
@@ -127,7 +129,7 @@ def process_csv_files():
             start_idx = len(existing_df)
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
-            with open(output_filename, 'w', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'w', newline='', encoding='latin-1', errors="replace") as f:
                 writer = csv.writer(f)
                 writer.writerow(['text', 'actual_class', 'actual_label', 'predicted_label'])
         
@@ -143,7 +145,7 @@ def process_csv_files():
             print(f"Text: {text[:100]}...")
             print(f"Actual: {actual_label} | Predicted: {prediction}")
             
-            with open(output_filename, 'a', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'a', newline='', encoding='latin-1', errors="replace") as f:
                 writer = csv.writer(f)
                 writer.writerow([text, actual_class, actual_label, prediction])
             

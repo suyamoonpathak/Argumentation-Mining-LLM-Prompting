@@ -5,7 +5,7 @@ import glob
 import pandas as pd
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 # -----------------------------
 # 1. Load LLaMA3 model once
 # -----------------------------
@@ -29,7 +29,7 @@ print("Model loaded successfully.")
 # 3. LLaMA3 inference function
 # -----------------------------
 def get_relation_prediction(source_text, target_text):
-    prompt = """You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
+    prompt = f"""You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Your task is to analyze the relationship between two legal arguments with the precision and analytical rigor expected in top-tier legal academia.
 
 CLASSIFICATION TASK:
 Determine the relationship between the source argument and target argument. The relationship can be "support", "attack", or "no-relation".
@@ -133,7 +133,7 @@ def process_csv_files():
             start_idx = len(existing_df)
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
-            with open(output_filename, 'w', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'w', newline='', encoding='utf-8', errors="replace") as f:
                 writer = csv.writer(f)
                 writer.writerow(['source_text', 'target_text', 'actual_relation', 'predicted_relation'])
         
@@ -149,10 +149,10 @@ def process_csv_files():
             print(f"Source: {source_text[:50]}...")
             print(f"Target: {target_text[:50]}...")
             
-            prediction = get_relation_prediction(source_text, target_text, file_name)
+            prediction = get_relation_prediction(source_text, target_text)
             print(f"Actual: {actual_relation} | Predicted: {prediction}")
             
-            with open(output_filename, 'a', newline='', encoding='utf-8') as f:
+            with open(output_filename, 'a', newline='', encoding='utf-8', errors="replace") as f:
                 writer = csv.writer(f)
                 writer.writerow([source_text, target_text, actual_relation, prediction])
             

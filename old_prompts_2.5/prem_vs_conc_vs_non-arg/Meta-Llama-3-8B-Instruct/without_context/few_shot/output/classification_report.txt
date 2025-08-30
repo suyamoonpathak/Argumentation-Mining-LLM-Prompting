@@ -1,0 +1,9 @@
+                   precision    recall  f1-score   support
+
+       conclusion       0.26      0.86      0.39        44
+non-argumentative       0.90      0.42      0.57       847
+          premise       0.54      0.86      0.67       611
+
+         accuracy                           0.61      1502
+        macro avg       0.57      0.71      0.54      1502
+     weighted avg       0.74      0.61      0.60      1502

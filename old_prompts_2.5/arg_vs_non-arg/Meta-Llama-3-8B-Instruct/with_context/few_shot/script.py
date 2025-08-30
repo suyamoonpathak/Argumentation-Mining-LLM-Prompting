@@ -8,6 +8,8 @@ import pandas as pd
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 # -----------------------------
 # 1. Load LLaMA3 model
 # -----------------------------
@@ -30,7 +32,7 @@ def get_case_file_content(filename):
     case_filename = filename.replace('.csv', '.txt')
     case_file_path = os.path.join('original_txt_files', case_filename)
     if os.path.exists(case_file_path):
-        with open(case_file_path, 'r', encoding='latin-1') as f:
+        with open(case_file_path, 'r', encoding='latin-1', errors='replace') as f:
             return f.read()
     else:
         return "Complete case file not found."
@@ -102,38 +104,49 @@ def get_argumentative_prediction(text, filename):
             
             Your classification:"""
 
-    messages = [{"role": "user", "content": prompt}]
-    input_ids = tokenizer.apply_chat_template(
+    messages = [{"role": "system", "content": "You are a Harvard-trained legal scholar with expertise in legal argumentation analysis. Help classify legal text as 'argumentative' or 'non-argumentative' based on its rhetorical function."},
+        {"role": "user", "content": prompt}]
+
+    # Build chat text, then tokenize to get attention_mask
+    chat_text = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
-        return_tensors="pt"
-    ).to(device)
+        tokenize=False,          # return string, not tensors
+    )
 
-    terminators = [
-        tokenizer.eos_token_id,
-        tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    ]
+    enc = tokenizer(
+        chat_text,
+        return_tensors="pt",
+        padding=True,            # enables attention_mask
+    )
+    enc = {k: v.to(device) for k, v in enc.items()}
+
+    terminators = [tokenizer.eos_token_id, tokenizer.convert_tokens_to_ids("<|eot_id|>")]
+    terminators = [t for t in terminators if t is not None]
 
     with torch.no_grad():
         outputs = model.generate(
-            input_ids,
+            input_ids=enc["input_ids"],
+            attention_mask=enc["attention_mask"],  # << pass mask
             max_new_tokens=128,
             eos_token_id=terminators,
             do_sample=True,
             temperature=0.6,
             top_p=0.9,
+            pad_token_id=tokenizer.pad_token_id,   # safe even if set in config
         )
 
-    response = outputs[0][input_ids.shape[-1]:]
+    response = outputs[0][enc["input_ids"].shape[-1]:]
     prediction = tokenizer.decode(response, skip_special_tokens=True).strip().lower()
 
-    # Normalize output
-    if 'argumentative' in prediction and 'non-argumentative' not in prediction:
-        return 'argumentative'
-    elif 'non-argumentative' in prediction:
-        return 'non-argumentative'
-    else:
-        return '--'
+    return prediction
+    # # Normalize output
+    # if 'argumentative' in prediction and 'non-argumentative' not in prediction:
+    #     return 'argumentative'
+    # elif 'non-argumentative' in prediction:
+    #     return 'non-argumentative'
+    # else:
+    #     return '--'
 
 
 # -----------------------------
@@ -165,7 +178,7 @@ def process_csv_files():
             start_idx = len(existing_df)
             print(f"📂 Found existing predictions file. Resuming from row {start_idx + 1}")
         else:
-            with open(output_filename, 'w', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'w', newline='', encoding='latin-1', errors='replace') as f:
                 writer = csv.writer(f)
                 writer.writerow(['text', 'actual_class', 'actual_label', 'predicted_label'])
 
@@ -182,7 +195,7 @@ def process_csv_files():
             print(f"Text: {text[:100]}...")
             print(f"Actual: {actual_label} | Predicted: {prediction}")
 
-            with open(output_filename, 'a', newline='', encoding='latin-1') as f:
+            with open(output_filename, 'a', newline='', encoding='latin-1', errors='replace') as f:
                 writer = csv.writer(f)
                 writer.writerow([text, actual_class, actual_label, prediction])
 
